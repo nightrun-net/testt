@@ -1,0 +1,582 @@
+
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CYBER SYSTEM | ACCESS</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;600;800&display=swap');
+
+:root {
+  --green: #00ff88;
+  --dark: #030a08;
+  --border: rgba(0,255,136,.25);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--dark);
+  color: var(--green);
+  font-family: 'Share Tech Mono', monospace;
+  overflow: hidden;
+}
+
+#matrix {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  opacity: .35;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    circle,
+    transparent 15%,
+    rgba(0,0,0,.85) 100%
+  );
+}
+
+.scanlines {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 3px,
+    rgba(0,255,136,.025) 4px
+  );
+}
+
+.main {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.panel {
+  width: 100%;
+  max-width: 750px;
+  padding: 35px;
+  background: rgba(2,14,10,.92);
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  box-shadow:
+    0 0 50px rgba(0,255,136,.08),
+    inset 0 0 30px rgba(0,255,136,.025);
+  backdrop-filter: blur(14px);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 18px;
+  direction: ltr;
+}
+
+.logo {
+  font-family: Orbitron, sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 3px;
+}
+
+.status {
+  font-size: 11px;
+  color: #85bba0;
+}
+
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 7px;
+  background: var(--green);
+  box-shadow: 0 0 12px var(--green);
+  animation: blink 1s infinite;
+}
+
+.content {
+  text-align: center;
+  padding: 45px 0 25px;
+}
+
+.icon {
+  font-size: 65px;
+  margin-bottom: 15px;
+  filter: drop-shadow(0 0 20px #00ff8860);
+}
+
+.title {
+  font-family: Orbitron, sans-serif;
+  font-size: clamp(22px, 5vw, 38px);
+  letter-spacing: 3px;
+  text-shadow: 0 0 25px #00ff8870;
+  margin: 10px 0;
+}
+
+.subtitle {
+  color: #7ca993;
+  font-size: 14px;
+  line-height: 2;
+}
+
+button {
+  margin-top: 30px;
+  background: var(--green);
+  color: #001b0d;
+  border: none;
+  border-radius: 8px;
+  padding: 18px 45px;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 0 25px #00ff8840;
+  transition: .25s;
+}
+
+button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 45px #00ff8880;
+}
+
+button:active {
+  transform: scale(.96);
+}
+
+.terminal {
+  display: none;
+  height: 250px;
+  background: #010705;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 17px;
+  margin-top: 25px;
+  overflow-y: auto;
+  text-align: left;
+  direction: ltr;
+  font-size: 13px;
+  line-height: 1.8;
+  scrollbar-width: thin;
+}
+
+.line {
+  animation: appear .2s ease;
+  overflow-wrap: anywhere;
+}
+
+.line.info { color: #76b99a; }
+.line.success { color: #00ff88; }
+.line.warning { color: #ffcc55; }
+
+.progress-area {
+  display: none;
+  margin-top: 25px;
+  direction: ltr;
+}
+
+.progress-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.progress-track {
+  width: 100%;
+  height: 9px;
+  background: #102a1d;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--green);
+  box-shadow: 0 0 20px var(--green);
+  transition: width .12s linear;
+}
+
+.result {
+  display: none;
+  padding: 40px 0 20px;
+  text-align: center;
+}
+
+.success-icon {
+  font-size: 70px;
+  animation: pulse 1.5s infinite;
+}
+
+.result h1 {
+  font-size: clamp(25px, 6vw, 45px);
+  line-height: 1.7;
+  color: var(--green);
+  text-shadow: 0 0 30px #00ff8880;
+}
+
+.result p {
+  color: #a4c7b4;
+  line-height: 2;
+}
+
+.glitch {
+  animation: glitch .18s 7;
+}
+
+.footer {
+  margin-top: 30px;
+  border-top: 1px solid var(--border);
+  padding-top: 17px;
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #56846b;
+}
+
+@keyframes blink {
+  50% { opacity: .15; }
+}
+
+@keyframes pulse {
+  50% { transform: scale(1.13); }
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes glitch {
+  0% { transform: translate(0); }
+  25% { transform: translate(-5px, 2px); }
+  50% { transform: translate(5px, -3px); }
+  75% { transform: translate(-3px, 4px); }
+  100% { transform: translate(0); }
+}
+
+@media(max-width:600px) {
+  .panel { padding: 20px; }
+  .content { padding: 30px 0 15px; }
+  .terminal { height: 230px; font-size: 11px; }
+  .logo { font-size: 11px; }
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="matrix"></canvas>
+<div class="overlay"></div>
+<div class="scanlines"></div>
+
+<div class="main">
+  <div class="panel" id="panel">
+
+    <div class="header">
+      <div class="logo">CYBER<span style="color:white">.SYS</span></div>
+      <div class="status">
+        <span class="dot"></span>
+        <span id="systemStatus">SYSTEM ONLINE</span>
+      </div>
+    </div>
+
+    <div id="startScreen" class="content">
+      <div class="icon">⌘</div>
+
+      <h1 class="title">CYBER ACCESS</h1>
+
+      <p class="subtitle">
+        سیستەم ئامادەیە
+        <br>
+        بۆ دەستپێکرنا تاقیکرنێ کلیک بکە
+      </p>
+
+      <button id="startBtn" onclick="startHack()">
+        دەستپێبکە
+      </button>
+    </div>
+
+    <div id="hackScreen" style="display:none">
+
+      <h2 class="title"
+          style="font-size:20px;text-align:center;margin-top:30px">
+        SYSTEM PROCESSING
+      </h2>
+
+      <div id="terminal" class="terminal"></div>
+
+      <div id="progressArea" class="progress-area">
+        <div class="progress-top">
+          <span id="progressText">INITIALIZING...</span>
+          <span id="percentage">0%</span>
+        </div>
+
+        <div class="progress-track">
+          <div id="progressBar" class="progress-bar"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="resultScreen" class="result">
+      <div class="success-icon">✓</div>
+
+      <h1 id="resultTitle">
+        سەرکەفتی!
+        <br>
+        تۆ هاتیە هاککرن!
+      </h1>
+
+      <p>
+        هەمی پڕۆسە ب سەرکەفتی تەمام بوو
+      </p>
+
+      <p style="color:#ffcc55;font-size:13px">
+        😎 ئەڤە بتنێ تاقیکرنەکا خۆشە!
+      </p>
+
+      <button onclick="resetHack()">
+        دووبارە تاقی بکە
+      </button>
+    </div>
+
+    <div class="footer">
+      CYBER SECURITY INTERFACE • DEMO MODE
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ==================================
+// MATRIX RAIN BACKGROUND
+// ==================================
+
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
+
+let drops = [];
+let fontSize = 14;
+
+function resizeMatrix() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const columns = Math.ceil(canvas.width / fontSize);
+  drops = Array(columns).fill(1);
+}
+
+resizeMatrix();
+window.addEventListener("resize", resizeMatrix);
+
+const chars = "01ABCDEF#$%&";
+
+function drawMatrix() {
+  ctx.fillStyle = "rgba(3,10,8,0.07)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = "#00ff88";
+  ctx.font = fontSize + "px monospace";
+
+  for (let i = 0; i < drops.length; i++) {
+    const char = chars[Math.floor(Math.random() * chars.length)];
+
+    ctx.fillText(
+      char,
+      i * fontSize,
+      drops[i] * fontSize
+    );
+
+    if (
+      drops[i] * fontSize > canvas.height &&
+      Math.random() > 0.975
+    ) {
+      drops[i] = 0;
+    }
+
+    drops[i]++;
+  }
+}
+
+setInterval(drawMatrix, 45);
+
+// ==================================
+// FAKE HACKING TERMINAL
+// ==================================
+
+const terminal = document.getElementById("terminal");
+const progressBar = document.getElementById("progressBar");
+const percentage = document.getElementById("percentage");
+const progressText = document.getElementById("progressText");
+
+let running = false;
+let timerIds = [];
+
+const messages = [
+  ["INITIALIZING CYBER SYSTEM...", "info"],
+  ["Loading security simulation modules...", "info"],
+  ["Connecting to virtual environment...", "info"],
+  ["[OK] Virtual connection established", "success"],
+  ["Starting simulated network scan...", "info"],
+  ["Scanning virtual port 8080...", "info"],
+  ["Scanning virtual port 443...", "info"],
+  ["[OK] Demo scanning complete", "success"],
+  ["Loading fake encryption keys...", "warning"],
+  ["Analyzing simulated security layers...", "info"],
+  ["Generating random access tokens...", "info"],
+  ["TOKEN: " + randomHex(24), "warning"],
+  ["Running fictional access sequence...", "info"],
+  ["[OK] Visual access granted", "success"],
+  ["Processing demo system files...", "info"],
+  ["Decrypting simulated data blocks...", "warning"],
+  ["BYPASS ANIMATION: ENABLED", "warning"],
+  ["Finalizing simulation...", "info"],
+  ["[SUCCESS] ALL DEMO TASKS COMPLETED", "success"]
+];
+
+function randomHex(length) {
+  const symbols = "0123456789ABCDEF";
+  let output = "";
+
+  for (let i = 0; i < length; i++) {
+    output += symbols[Math.floor(Math.random() * 16)];
+  }
+
+  return output;
+}
+
+function addLog(text, type = "info") {
+  const line = document.createElement("div");
+  line.className = "line " + type;
+  line.textContent = "> " + text;
+
+  terminal.appendChild(line);
+  terminal.scrollTop = terminal.scrollHeight;
+}
+
+function schedule(fn, delay) {
+  const id = setTimeout(fn, delay);
+  timerIds.push(id);
+}
+
+function startHack() {
+  if (running) return;
+  running = true;
+
+  document.getElementById("startScreen").style.display = "none";
+  document.getElementById("hackScreen").style.display = "block";
+  document.getElementById("resultScreen").style.display = "none";
+
+  document.getElementById("systemStatus").textContent = "PROCESSING";
+
+  terminal.style.display = "block";
+  document.getElementById("progressArea").style.display = "block";
+
+  terminal.innerHTML = "";
+  progressBar.style.width = "0%";
+  percentage.textContent = "0%";
+
+  let progress = 0;
+  let messageIndex = 0;
+
+  function update() {
+    if (!running) return;
+
+    progress += Math.floor(Math.random() * 4) + 1;
+    progress = Math.min(progress, 100);
+
+    progressBar.style.width = progress + "%";
+    percentage.textContent = progress + "%";
+
+    if (messageIndex < messages.length) {
+      const target = Math.floor(
+        progress / 100 * messages.length
+      );
+
+      while (
+        messageIndex <= target &&
+        messageIndex < messages.length
+      ) {
+        addLog(
+          messages[messageIndex][0],
+          messages[messageIndex][1]
+        );
+
+        messageIndex++;
+      }
+    }
+
+    if (progress < 35) {
+      progressText.textContent = "SCANNING...";
+    } else if (progress < 70) {
+      progressText.textContent = "PROCESSING...";
+    } else if (progress < 100) {
+      progressText.textContent = "FINALIZING...";
+    } else {
+      progressText.textContent = "COMPLETE";
+
+      addLog("SIMULATION COMPLETE!", "success");
+
+      schedule(showResult, 900);
+      return;
+    }
+
+    schedule(update, 110 + Math.random() * 160);
+  }
+
+  update();
+}
+
+function showResult() {
+  document.getElementById("hackScreen").style.display = "none";
+  document.getElementById("resultScreen").style.display = "block";
+  document.getElementById("systemStatus").textContent = "COMPLETE";
+
+  const panel = document.getElementById("panel");
+  panel.classList.add("glitch");
+
+  schedule(() => panel.classList.remove("glitch"), 1500);
+
+  running = false;
+}
+
+function resetHack() {
+  timerIds.forEach(clearTimeout);
+  timerIds = [];
+  running = false;
+
+  document.getElementById("startScreen").style.display = "block";
+  document.getElementById("hackScreen").style.display = "none";
+  document.getElementById("resultScreen").style.display = "none";
+  document.getElementById("systemStatus").textContent = "SYSTEM ONLINE";
+
+  terminal.innerHTML = "";
+}
+</script>
+
+</body>
+</html>
