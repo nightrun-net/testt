@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html lang="ku" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -87,7 +87,6 @@ body {
   align-items: center;
   border-bottom: 1px solid var(--border);
   padding-bottom: 18px;
-  direction: ltr;
 }
 
 .logo {
@@ -138,29 +137,6 @@ body {
   line-height: 2;
 }
 
-button {
-  margin-top: 30px;
-  background: var(--green);
-  color: #001b0d;
-  border: none;
-  border-radius: 8px;
-  padding: 18px 45px;
-  font-size: 20px;
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 0 25px #00ff8840;
-  transition: .25s;
-}
-
-button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 0 45px #00ff8880;
-}
-
-button:active {
-  transform: scale(.96);
-}
-
 .terminal {
   display: none;
   height: 250px;
@@ -171,7 +147,6 @@ button:active {
   margin-top: 25px;
   overflow-y: auto;
   text-align: left;
-  direction: ltr;
   font-size: 13px;
   line-height: 1.8;
   scrollbar-width: thin;
@@ -189,7 +164,6 @@ button:active {
 .progress-area {
   display: none;
   margin-top: 25px;
-  direction: ltr;
 }
 
 .progress-top {
@@ -227,8 +201,9 @@ button:active {
 }
 
 .result h1 {
-  font-size: clamp(25px, 6vw, 45px);
-  line-height: 1.7;
+  font-family: Orbitron, sans-serif;
+  font-size: clamp(23px, 6vw, 43px);
+  line-height: 1.5;
   color: var(--green);
   text-shadow: 0 0 30px #00ff8880;
 }
@@ -236,6 +211,15 @@ button:active {
 .result p {
   color: #a4c7b4;
   line-height: 2;
+}
+
+.phone {
+  display: block;
+  color: #fff;
+  font-size: clamp(23px, 5vw, 34px);
+  text-decoration: none;
+  margin: 16px 0;
+  text-shadow: 0 0 20px #00ff8870;
 }
 
 .glitch {
@@ -284,6 +268,7 @@ button:active {
   .content { padding: 30px 0 15px; }
   .terminal { height: 230px; font-size: 11px; }
   .logo { font-size: 11px; }
+  .status { font-size: 9px; }
 }
 </style>
 </head>
@@ -298,7 +283,9 @@ button:active {
   <div class="panel" id="panel">
 
     <div class="header">
-      <div class="logo">CYBER<span style="color:white">.SYS</span></div>
+      <div class="logo">
+        CYBER<span style="color:white">.SYS</span>
+      </div>
       <div class="status">
         <span class="dot"></span>
         <span id="systemStatus">SYSTEM ONLINE</span>
@@ -307,22 +294,15 @@ button:active {
 
     <div id="startScreen" class="content">
       <div class="icon">⌘</div>
-
       <h1 class="title">CYBER ACCESS</h1>
-
       <p class="subtitle">
-        سیستەم ئامادەیە
+        Initializing cyber security simulation...
         <br>
-        بۆ دەستپێکرنا تاقیکرنێ کلیک بکە
+        Automatic sequence starting shortly.
       </p>
-
-      <button id="startBtn" onclick="startHack()">
-        دەستپێبکە
-      </button>
     </div>
 
     <div id="hackScreen" style="display:none">
-
       <h2 class="title"
           style="font-size:20px;text-align:center;margin-top:30px">
         SYSTEM PROCESSING
@@ -346,23 +326,24 @@ button:active {
       <div class="success-icon">✓</div>
 
       <h1 id="resultTitle">
-        سەرکەفتی!
+        ACCESS GRANTED!
         <br>
-        تۆ هاتیە هاککرن!
+        YOU HAVE BEEN HACKED! 😈
       </h1>
 
       <p>
-        هەمی پڕۆسە ب سەرکەفتی تەمام بوو
+        Simulation successfully completed.
+        <br>
+        This was a prank. No actual hacking occurred.
       </p>
-<h1>
-  سەرکەفتی! ✅
-  <br>
-  لافين، تۆ هاتیە هاککرن! 😈
-</h1>
 
-      <button onclick="resetHack()">
-         try 
-      </button>
+      <p>
+        If you want to be hacked, call this number:
+      </p>
+
+      <a class="phone" href="tel:07500000000">
+        07500000000
+      </a>
     </div>
 
     <div class="footer">
@@ -373,15 +354,13 @@ button:active {
 </div>
 
 <script>
-// ==================================
 // MATRIX RAIN BACKGROUND
-// ==================================
 
 const canvas = document.getElementById("matrix");
 const ctx = canvas.getContext("2d");
 
 let drops = [];
-let fontSize = 14;
+const fontSize = 14;
 
 function resizeMatrix() {
   canvas.width = window.innerWidth;
@@ -404,7 +383,8 @@ function drawMatrix() {
   ctx.font = fontSize + "px monospace";
 
   for (let i = 0; i < drops.length; i++) {
-    const char = chars[Math.floor(Math.random() * chars.length)];
+    const char =
+      chars[Math.floor(Math.random() * chars.length)];
 
     ctx.fillText(
       char,
@@ -425,9 +405,7 @@ function drawMatrix() {
 
 setInterval(drawMatrix, 45);
 
-// ==================================
-// FAKE HACKING TERMINAL
-// ==================================
+// FAKE HACKING SIMULATION
 
 const terminal = document.getElementById("terminal");
 const progressBar = document.getElementById("progressBar");
@@ -436,28 +414,6 @@ const progressText = document.getElementById("progressText");
 
 let running = false;
 let timerIds = [];
-
-const messages = [
-  ["INITIALIZING CYBER SYSTEM...", "info"],
-  ["Loading security simulation modules...", "info"],
-  ["Connecting to virtual environment...", "info"],
-  ["[OK] Virtual connection established", "success"],
-  ["Starting simulated network scan...", "info"],
-  ["Scanning virtual port 8080...", "info"],
-  ["Scanning virtual port 443...", "info"],
-  ["[OK] Demo scanning complete", "success"],
-  ["Loading fake encryption keys...", "warning"],
-  ["Analyzing simulated security layers...", "info"],
-  ["Generating random access tokens...", "info"],
-  ["TOKEN: " + randomHex(24), "warning"],
-  ["Running fictional access sequence...", "info"],
-  ["[OK] Visual access granted", "success"],
-  ["Processing demo system files...", "info"],
-  ["Decrypting simulated data blocks...", "warning"],
-  ["BYPASS ANIMATION: ENABLED", "warning"],
-  ["Finalizing simulation...", "info"],
-  ["[SUCCESS] ALL DEMO TASKS COMPLETED", "success"]
-];
 
 function randomHex(length) {
   const symbols = "0123456789ABCDEF";
@@ -469,6 +425,28 @@ function randomHex(length) {
 
   return output;
 }
+
+const messages = [
+  ["INITIALIZING CYBER SYSTEM...", "info"],
+  ["Loading simulation modules...", "info"],
+  ["Connecting to virtual environment...", "info"],
+  ["[OK] Virtual connection established", "success"],
+  ["Starting simulated network scan...", "info"],
+  ["Scanning virtual port 8080...", "info"],
+  ["Scanning virtual port 443...", "info"],
+  ["[OK] Demo scanning complete", "success"],
+  ["Loading fictional encryption keys...", "warning"],
+  ["Analyzing simulated security layers...", "info"],
+  ["Generating random access tokens...", "info"],
+  ["TOKEN: " + randomHex(24), "warning"],
+  ["Running fictional access sequence...", "info"],
+  ["[OK] Visual access granted", "success"],
+  ["Processing demo system files...", "info"],
+  ["Decrypting simulated data blocks...", "warning"],
+  ["BYPASS ANIMATION: ENABLED", "warning"],
+  ["Finalizing simulation...", "info"],
+  ["[SUCCESS] ALL DEMO TASKS COMPLETED", "success"]
+];
 
 function addLog(text, type = "info") {
   const line = document.createElement("div");
@@ -492,10 +470,13 @@ function startHack() {
   document.getElementById("hackScreen").style.display = "block";
   document.getElementById("resultScreen").style.display = "none";
 
-  document.getElementById("systemStatus").textContent = "PROCESSING";
+  document.getElementById("systemStatus").textContent =
+    "PROCESSING";
 
   terminal.style.display = "block";
-  document.getElementById("progressArea").style.display = "block";
+
+  document.getElementById("progressArea").style.display =
+    "block";
 
   terminal.innerHTML = "";
   progressBar.style.width = "0%";
@@ -513,22 +494,19 @@ function startHack() {
     progressBar.style.width = progress + "%";
     percentage.textContent = progress + "%";
 
-    if (messageIndex < messages.length) {
-      const target = Math.floor(
-        progress / 100 * messages.length
+    const target = Math.floor(
+      progress / 100 * messages.length
+    );
+
+    while (
+      messageIndex <= target &&
+      messageIndex < messages.length
+    ) {
+      addLog(
+        messages[messageIndex][0],
+        messages[messageIndex][1]
       );
-
-      while (
-        messageIndex <= target &&
-        messageIndex < messages.length
-      ) {
-        addLog(
-          messages[messageIndex][0],
-          messages[messageIndex][1]
-        );
-
-        messageIndex++;
-      }
+      messageIndex++;
     }
 
     if (progress < 35) {
@@ -555,7 +533,9 @@ function startHack() {
 function showResult() {
   document.getElementById("hackScreen").style.display = "none";
   document.getElementById("resultScreen").style.display = "block";
-  document.getElementById("systemStatus").textContent = "COMPLETE";
+
+  document.getElementById("systemStatus").textContent =
+    "COMPLETE";
 
   const panel = document.getElementById("panel");
   panel.classList.add("glitch");
@@ -565,18 +545,10 @@ function showResult() {
   running = false;
 }
 
-function resetHack() {
-  timerIds.forEach(clearTimeout);
-  timerIds = [];
-  running = false;
-
-  document.getElementById("startScreen").style.display = "block";
-  document.getElementById("hackScreen").style.display = "none";
-  document.getElementById("resultScreen").style.display = "none";
-  document.getElementById("systemStatus").textContent = "SYSTEM ONLINE";
-
-  terminal.innerHTML = "";
-}
+// AUTOMATIC START AFTER OPENING PAGE
+window.addEventListener("DOMContentLoaded", () => {
+  schedule(startHack, 2000);
+});
 </script>
 
 </body>
